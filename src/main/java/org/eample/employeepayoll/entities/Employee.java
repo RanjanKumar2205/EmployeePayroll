@@ -1,10 +1,9 @@
 package org.eample.employeepayoll.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,6 +17,7 @@ import java.time.LocalDateTime;
 public class Employee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(unique = true, nullable = false, updatable = false)
     private Long id;
     private String employeeCode;
     private String firstName;
@@ -26,8 +26,14 @@ public class Employee {
     private String phoneNumber;
     private LocalDate dateOfJoining;
     private String designation;
-    private String employeeType;
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private EmployeeType employeeType;
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private EmployeeStatus status = EmployeeStatus.ACTIVE;
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
 }

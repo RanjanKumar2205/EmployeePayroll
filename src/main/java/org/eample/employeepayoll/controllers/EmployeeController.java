@@ -1,8 +1,8 @@
 package org.eample.employeepayoll.controllers;
 
+import jakarta.validation.Valid;
 import org.eample.employeepayoll.dtos.EmployeeRequestDto;
 import org.eample.employeepayoll.dtos.EmployeeResponseDto;
-import org.eample.employeepayoll.entities.Employee;
 import org.eample.employeepayoll.services.EmployeeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/employees")
@@ -36,13 +35,13 @@ public class EmployeeController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<?> addEmployee(@RequestBody EmployeeRequestDto employeeRequestDto) {
+    public ResponseEntity<?> addEmployee(@Valid @RequestBody EmployeeRequestDto employeeRequestDto) {
         EmployeeResponseDto newEmployee = employeeService.addEmployee(employeeRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(newEmployee);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateEmployee(@PathVariable Long id, @RequestBody EmployeeRequestDto employeeRequestDto) {
+    public ResponseEntity<?> updateEmployee(@PathVariable Long id, @Valid @RequestBody EmployeeRequestDto employeeRequestDto) {
         if(!employeeService.existsById(id)) return ResponseEntity.notFound().build();
         EmployeeResponseDto employee = employeeService.patchEmployee(id, employeeRequestDto);
         return ResponseEntity.ok(employee);

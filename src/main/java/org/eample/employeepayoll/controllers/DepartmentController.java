@@ -40,7 +40,7 @@ public class DepartmentController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateDepartment(@PathVariable Long id, @Valid @RequestBody DepartmentRequestDto departmentRequestDto) {
-        DepartmentResponseDto department = departmentService.patchDepartment(id, departmentRequestDto);
+        DepartmentResponseDto department = departmentService.putDepartment(id, departmentRequestDto);
         return ResponseEntity.ok(department);
     }
 

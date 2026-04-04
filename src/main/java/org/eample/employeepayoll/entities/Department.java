@@ -24,9 +24,10 @@ public class Department {
     @Builder.Default
     private Status status = Status.ACTIVE;
 
-    @OneToMany(mappedBy = "department")
+    @OneToMany(mappedBy = "department", fetch = FetchType.LAZY)
     private Collection<Employee> employee;
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "manager_id")
-//    private Employee manager_id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "manager_id")
+    private Employee manager;
 }

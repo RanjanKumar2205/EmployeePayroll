@@ -9,8 +9,8 @@ import org.eample.employeepayoll.exceptions.ResourceNotFoundException;
 import org.eample.employeepayoll.repositories.DepartmentRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 @Service
 public class DepartmentService {
@@ -24,12 +24,10 @@ public class DepartmentService {
     }
 
     public Collection<DepartmentResponseDto> getDepartments() {
-        Collection<Department> departmentList = departmentRepository.findAll();
-        Collection<DepartmentResponseDto> departmentResponseDtoList = new ArrayList<>();
-        for (Department department : departmentList) {
-            departmentResponseDtoList.add(departmentMapper.toResponse(department));
-        }
-        return departmentResponseDtoList;
+        return departmentRepository.findAll()
+                .stream()
+                .map(departmentMapper::toResponse)
+                .collect(Collectors.toList());
     }
 
     public DepartmentResponseDto getDepartmentById(Long id) {
@@ -63,7 +61,7 @@ public class DepartmentService {
         return departmentMapper.toResponse(department);
     }
 
-    public void applyPatch(DepartmentRequestDto departmentRequestDto, Department department) {
+    private void applyPatch(DepartmentRequestDto departmentRequestDto, Department department) {
         if(departmentRequestDto.getName() != null) department.setName(departmentRequestDto.getName());
         if(departmentRequestDto.getCode() != null) department.setCode(departmentRequestDto.getCode());
     }

@@ -3,13 +3,13 @@ package org.eample.employeepayoll.controllers;
 import jakarta.validation.Valid;
 import org.eample.employeepayoll.dtos.EmployeeRequestDto;
 import org.eample.employeepayoll.dtos.EmployeeResponseDto;
+import org.eample.employeepayoll.entities.Status;
 import org.eample.employeepayoll.services.EmployeeService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Collection;
 
 @RestController
 @RequestMapping("/api/v1/employees")
@@ -21,15 +21,23 @@ public class EmployeeController {
         this.employeeService = employeeService;
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<?> search(@RequestParam(required = false) String name,
+                                    @RequestParam(required = false) String dept,
+                                    @RequestParam(required = false) Status status,
+                                    Pageable pageable) {
+        Page<EmployeeResponseDto> results = employeeService.searchEmployees(name, dept, status, pageable);
+        return ResponseEntity.ok(results);
+    }
+
     @GetMapping("/")
-    public ResponseEntity<?> getAllEmployees() {
-        Collection<EmployeeResponseDto> employeeList = employeeService.getEmployees();
+    public ResponseEntity<?> getAllEmployees(Pageable pageable) {
+        Page<EmployeeResponseDto> employeeList = employeeService.getEmployees(pageable);
         return ResponseEntity.ok(employeeList);
     }
 
-    @RequestMapping(method = RequestMethod.GET, path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping("/{id}")
     public ResponseEntity<?> getEmployee(@PathVariable Long id) {
-//        if(!employeeService.existsById(id)) return ResponseEntity.notFound().build();
         EmployeeResponseDto employee = employeeService.getEmployeeById(id);
         return ResponseEntity.ok(employee);
     }
@@ -42,21 +50,18 @@ public class EmployeeController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateEmployee(@PathVariable Long id, @Valid @RequestBody EmployeeRequestDto employeeRequestDto) {
-//        if(!employeeService.existsById(id)) return ResponseEntity.notFound().build();
         EmployeeResponseDto employee = employeeService.putEmployee(id, employeeRequestDto);
         return ResponseEntity.ok(employee);
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<?> patchEmployee(@PathVariable Long id, @RequestBody EmployeeRequestDto employeeRequestDto) {
-//        if(!employeeService.existsById(id)) return ResponseEntity.notFound().build();
         EmployeeResponseDto employee = employeeService.patchEmployee(id, employeeRequestDto);
         return ResponseEntity.ok(employee);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteEmployee(@PathVariable Long id) {
-//        if(!employeeService.existsById(id)) return ResponseEntity.notFound().build();
         EmployeeResponseDto employee = employeeService.deleteEmployeeById(id);
         return ResponseEntity.ok(employee);
     }

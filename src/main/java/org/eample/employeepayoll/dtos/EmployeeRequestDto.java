@@ -32,6 +32,5 @@ public class EmployeeRequestDto {
     @NotNull
     private EmployeeType employeeType;
     @NotNull
-    @NotBlank
     private Long departmentId;
 }

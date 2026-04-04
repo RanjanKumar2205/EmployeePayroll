@@ -15,23 +15,11 @@ public class DepartmentMapper {
     }
 
     public DepartmentResponseDto toResponse(Department department) {
-//        Collection<EmployeeSummaryDto> employeeSummaries = department.getEmployee()
-//                .stream()
-//                .map(emp -> EmployeeSummaryDto.builder()
-//                        .id(emp.getId())
-//                        .employeeCode(emp.getEmployeeCode())
-//                        .firstName(emp.getFirstName())
-//                        .lastName(emp.getLastName())
-//                        .designation(emp.getDesignation())
-//                        .build())
-//                .toList();
-
         return DepartmentResponseDto.builder()
                 .id(department.getId())
                 .name(department.getName())
                 .code(department.getCode())
                 .status(department.getStatus())
-//                .employee(employeeSummaries)
                 .build();
     }
 

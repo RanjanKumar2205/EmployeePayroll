@@ -9,10 +9,11 @@ import org.eample.employeepayoll.exceptions.ResourceNotFoundException;
 import org.eample.employeepayoll.mappers.EmployeeMapper;
 import org.eample.employeepayoll.repositories.DepartmentRepository;
 import org.eample.employeepayoll.repositories.EmployeeRepository;
+import org.eample.employeepayoll.specifications.EmployeeSpecification;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.Collection;
 
 @Service
 public class EmployeeService {
@@ -61,6 +62,12 @@ public class EmployeeService {
                 () -> new ResourceNotFoundException("Employee with id: " + id + " not found")
         );
         applyPatch(employeeRequestDto, employee);
+        if(employeeRequestDto.getDepartmentId() != null) {
+            Department department = departmentRepository.findById(employeeRequestDto.getDepartmentId()).orElseThrow(
+                    () -> new ResourceNotFoundException("Department with id: " + employeeRequestDto.getDepartmentId() + " not found")
+            );
+            employee.setDepartment(department);
+        }
         employee = employeeRepository.save(employee);
         return employeeMapper.toResponse(employee);
     }
@@ -74,9 +81,6 @@ public class EmployeeService {
         if(employeeRequestDto.getDesignation() != null) employee.setDesignation(employeeRequestDto.getDesignation());
         if(employeeRequestDto.getEmployeeType() != null) employee.setEmployeeType(employeeRequestDto.getEmployeeType());
         if(employeeRequestDto.getDateOfJoining() != null) employee.setDateOfJoining(employeeRequestDto.getDateOfJoining());
-        if(employeeRequestDto.getDepartmentId() != null) employee.setDepartment(departmentRepository.findById(employeeRequestDto.getDepartmentId()).orElseThrow(
-                () -> new ResourceNotFoundException("Department with id: " + employeeRequestDto.getDepartmentId() + " not found")
-        ));
     }
 
     public EmployeeResponseDto deleteEmployeeById(Long id) {
@@ -88,12 +92,17 @@ public class EmployeeService {
         return employeeMapper.toResponse(employee);
     }
 
-    public Collection<EmployeeResponseDto> getEmployees() {
-        Collection<Employee> employeeList = employeeRepository.findAll();
-        Collection<EmployeeResponseDto> employeeResponseDtoList = new ArrayList<>();
-        for (Employee employee : employeeList) {
-            employeeResponseDtoList.add(employeeMapper.toResponse(employee));
-        }
-        return employeeResponseDtoList;
+    public Page<EmployeeResponseDto> getEmployees(Pageable pageable) {
+        return employeeRepository.findAll(pageable).map(employeeMapper::toResponse);
+    }
+
+    public Page<EmployeeResponseDto> searchEmployees(String name, String dept, Status status, Pageable pageable) {
+        Specification<Employee> spec = Specification
+                .where(EmployeeSpecification.hasName(name))
+                .and(EmployeeSpecification.hasDepartment(dept))
+                .and(EmployeeSpecification.hasStatus(status));
+
+        return employeeRepository.findAll(spec, pageable)
+                .map(employeeMapper::toResponse);
     }
 }

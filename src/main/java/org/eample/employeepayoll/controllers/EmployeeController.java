@@ -29,7 +29,7 @@ public class EmployeeController {
 
     @RequestMapping(method = RequestMethod.GET, path = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getEmployee(@PathVariable Long id) {
-        if(!employeeService.existsById(id)) return ResponseEntity.notFound().build();
+//        if(!employeeService.existsById(id)) return ResponseEntity.notFound().build();
         EmployeeResponseDto employee = employeeService.getEmployeeById(id);
         return ResponseEntity.ok(employee);
     }
@@ -42,21 +42,21 @@ public class EmployeeController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateEmployee(@PathVariable Long id, @Valid @RequestBody EmployeeRequestDto employeeRequestDto) {
-        if(!employeeService.existsById(id)) return ResponseEntity.notFound().build();
-        EmployeeResponseDto employee = employeeService.patchEmployee(id, employeeRequestDto);
+//        if(!employeeService.existsById(id)) return ResponseEntity.notFound().build();
+        EmployeeResponseDto employee = employeeService.putEmployee(id, employeeRequestDto);
         return ResponseEntity.ok(employee);
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<?> patchEmployee(@PathVariable Long id, @RequestBody EmployeeRequestDto employeeRequestDto) {
-        if(!employeeService.existsById(id)) return ResponseEntity.notFound().build();
+//        if(!employeeService.existsById(id)) return ResponseEntity.notFound().build();
         EmployeeResponseDto employee = employeeService.patchEmployee(id, employeeRequestDto);
         return ResponseEntity.ok(employee);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteEmployee(@PathVariable Long id) {
-        if(!employeeService.existsById(id)) return ResponseEntity.notFound().build();
+//        if(!employeeService.existsById(id)) return ResponseEntity.notFound().build();
         EmployeeResponseDto employee = employeeService.deleteEmployeeById(id);
         return ResponseEntity.ok(employee);
     }

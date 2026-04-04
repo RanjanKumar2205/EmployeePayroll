@@ -1,6 +1,6 @@
 package org.eample.employeepayoll.entities;
 
-public enum EmployeeStatus {
+public enum Status {
     ACTIVE,
     INACTIVE,
     HOLD,

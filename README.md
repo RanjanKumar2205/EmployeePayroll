@@ -46,7 +46,7 @@ DTO              ← what crosses layer boundaries (Request in, Response out)
 ## Project Structure
 
 ```
-src/main/java/org/eample/employeepayoll/
+src/main/java/org/eample/employeepayroll/
 ├── controllers/          # REST endpoints
 │   ├── EmployeeController.java
 │   ├── DepartmentController.java

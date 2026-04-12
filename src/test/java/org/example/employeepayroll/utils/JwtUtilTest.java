@@ -2,7 +2,7 @@ package org.example.employeepayroll.utils;
 
 import org.example.employeepayroll.entities.Role;
 import org.example.employeepayroll.entities.User;
-import org.example.employeepayroll.entities.UserPrincipal;
+import org.example.employeepayroll.security.UserPrincipal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.userdetails.UserDetails;

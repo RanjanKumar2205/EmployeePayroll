@@ -1,5 +1,6 @@
 package org.example.employeepayroll.dtos;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
@@ -9,6 +10,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AuthRequestDto {
+    @Email
     @NotBlank(message = "Username is required")
     private String username;
     @NotBlank(message = "Password is required")

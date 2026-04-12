@@ -24,6 +24,9 @@ public class User {
     @Builder.Default
     private Role role = Role.GUEST;
 
+    @Builder.Default
+    private Boolean isProtected = false;
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_id")
     private Employee employee;

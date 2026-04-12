@@ -15,12 +15,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-// Create JwtAuthFilter extends OncePerRequestFilter.
-// In doFilterInternal: extract token from Authorization header, validate it, load UserDetails,
-// set UsernamePasswordAuthenticationToken in SecurityContextHolder.
-// Add filter to SecurityConfig before UsernamePasswordAuthenticationFilter.
-// Create AuthController with POST /auth/login (returns JWT) and POST /auth/register (saves user with BCrypt password).
-// Test full flow: register → login → get token → use token on /employees.
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 

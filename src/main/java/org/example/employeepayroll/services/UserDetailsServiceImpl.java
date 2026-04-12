@@ -1,7 +1,7 @@
 package org.example.employeepayroll.services;
 
 import org.example.employeepayroll.entities.User;
-import org.example.employeepayroll.entities.UserPrincipal;
+import org.example.employeepayroll.security.UserPrincipal;
 import org.example.employeepayroll.repositories.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

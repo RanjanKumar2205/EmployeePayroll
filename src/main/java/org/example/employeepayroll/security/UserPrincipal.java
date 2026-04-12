@@ -1,5 +1,6 @@
-package org.example.employeepayroll.entities;
+package org.example.employeepayroll.security;
 
+import org.example.employeepayroll.entities.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

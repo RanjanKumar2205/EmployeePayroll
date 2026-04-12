@@ -23,6 +23,7 @@ public class EmployeeController {
     }
 
     @GetMapping("/search")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('HR') or hasAuthority('EMPLOYEE')")
     public ResponseEntity<?> search(@RequestParam(required = false) String name,
                                     @RequestParam(required = false) String dept,
                                     @RequestParam(required = false) Status status,
@@ -32,39 +33,42 @@ public class EmployeeController {
     }
 
     @GetMapping("/")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('HR')")
     public ResponseEntity<?> getAllEmployees(Pageable pageable) {
         Page<EmployeeResponseDto> employeeList = employeeService.getEmployees(pageable);
         return ResponseEntity.ok(employeeList);
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('HR') or @authorizationService.isOwner(#id)")
     public ResponseEntity<?> getEmployee(@PathVariable Long id) {
         EmployeeResponseDto employee = employeeService.getEmployeeById(id);
         return ResponseEntity.ok(employee);
     }
 
     @PostMapping("/")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('HR')")
     public ResponseEntity<?> addEmployee(@Valid @RequestBody EmployeeRequestDto employeeRequestDto) {
         EmployeeResponseDto newEmployee = employeeService.addEmployee(employeeRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(newEmployee);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('HR')")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('HR')")
     public ResponseEntity<?> updateEmployee(@PathVariable Long id, @Valid @RequestBody EmployeeRequestDto employeeRequestDto) {
         EmployeeResponseDto employee = employeeService.putEmployee(id, employeeRequestDto);
         return ResponseEntity.ok(employee);
     }
 
     @PatchMapping("/{id}")
-    @PreAuthorize("hasRole('HR')")
+    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('HR')")
     public ResponseEntity<?> patchEmployee(@PathVariable Long id, @RequestBody EmployeeRequestDto employeeRequestDto) {
         EmployeeResponseDto employee = employeeService.patchEmployee(id, employeeRequestDto);
         return ResponseEntity.ok(employee);
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> deleteEmployee(@PathVariable Long id) {
         EmployeeResponseDto employee = employeeService.deleteEmployeeById(id);
         return ResponseEntity.ok(employee);

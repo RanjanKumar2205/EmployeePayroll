@@ -1,7 +1,7 @@
 package org.example.employeepayroll.utils;
 
 import org.example.employeepayroll.entities.Role;
-import org.example.employeepayroll.entities.User;
+import org.example.employeepayroll.entities.Users;
 import org.example.employeepayroll.security.UserPrincipal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,7 +21,7 @@ public class JwtUtilTest {
     void setUp() {
         jwtUtil = new JwtUtil(TEST_SECRET, TEST_EXPIRY);
 
-        User user = User.builder()
+        Users user = Users.builder()
                 .id(1L)
                 .username("ranjan@example.com")
                 .password("encodedPassword")
@@ -64,7 +64,7 @@ public class JwtUtilTest {
         String token = jwtUtil.generateToken(userDetails);
 
         // Different user — same structure but different username
-        User differentUser = User.builder()
+        Users differentUser = Users.builder()
                 .id(2L)
                 .username("someone.else@example.com")
                 .password("encodedPassword")

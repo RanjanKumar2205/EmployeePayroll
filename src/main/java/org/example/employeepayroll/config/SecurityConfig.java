@@ -1,5 +1,6 @@
 package org.example.employeepayroll.config;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.example.employeepayroll.filters.JwtAuthFilter;
 import org.example.employeepayroll.services.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
@@ -36,10 +37,23 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         requests ->
-                                requests.requestMatchers("/api/v1/auth/**", "/api/v1/health").permitAll().anyRequest().authenticated())
+                                requests.requestMatchers(
+                                        "/api/v1/auth/**",
+                                        "/api/v1/health",
+                                        "/swagger-ui.html",
+                                        "/swagger-ui/**",
+                                        "/v3/api-docs",
+                                        "/v3/api-docs/**")
+                                        .permitAll().anyRequest().authenticated())
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) ->
+                                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized"))
+                        .accessDeniedHandler((request, response, accessDeniedException) ->
+                                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden"))
+                )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }

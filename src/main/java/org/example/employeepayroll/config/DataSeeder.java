@@ -1,7 +1,7 @@
 package org.example.employeepayroll.config;
 
 import org.example.employeepayroll.entities.Role;
-import org.example.employeepayroll.entities.User;
+import org.example.employeepayroll.entities.Users;
 import org.example.employeepayroll.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
@@ -28,7 +28,7 @@ public class DataSeeder implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) {
         if (userRepository.findByRole(Role.ADMIN).isEmpty()) {
-            User admin = User.builder()
+            Users admin = Users.builder()
                     .username(adminUsername)
                     .password(passwordEncoder.encode(adminPassword))
                     .role(Role.ADMIN)

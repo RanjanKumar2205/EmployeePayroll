@@ -1,6 +1,6 @@
 package org.example.employeepayroll.security;
 
-import org.example.employeepayroll.entities.User;
+import org.example.employeepayroll.entities.Users;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,25 +10,25 @@ import java.util.List;
 
 public class UserPrincipal implements UserDetails {
 
-    private User user;
+    private Users users;
 
-    public UserPrincipal(User user) {
-        this.user = user;
+    public UserPrincipal(Users user) {
+        this.users = user;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(user.getRole().name()));
+        return List.of(new SimpleGrantedAuthority(users.getRole().name()));
     }
 
     @Override
     public String getPassword() {
-        return user.getPassword();
+        return users.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return user.getUsername();
+        return users.getUsername();
     }
 
     @Override
@@ -51,7 +51,7 @@ public class UserPrincipal implements UserDetails {
         return true;
     }
 
-    public User getUser() {
-        return user;
+    public Users getUser() {
+        return users;
     }
 }

@@ -35,6 +35,8 @@ public class EmployeeMapper {
                 .updatedAt(employee.getUpdatedAt())
                 .departmentId(employee.getDepartment() != null ? employee.getDepartment().getId() : null)
                 .departmentName(employee.getDepartment() != null ? employee.getDepartment().getName() : null)
+                .createdBy(employee.getCreatedBy())
+                .lastModifiedBy(employee.getLastModifiedBy())
                 .build();
     }
 

@@ -33,4 +33,5 @@ public class EmployeeRequestDto {
     private EmployeeType employeeType;
     @NotNull
     private Long departmentId;
+    private Long managerId;
 }

@@ -4,6 +4,8 @@ import lombok.*;
 import org.example.employeepayroll.entities.EmployeeType;
 import org.example.employeepayroll.entities.Status;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -12,7 +14,9 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class EmployeeResponseDto {
+public class EmployeeResponseDto implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     private Long id;
     private String employeeCode;
     private String firstName;
@@ -26,4 +30,6 @@ public class EmployeeResponseDto {
     private LocalDateTime updatedAt;
     private Long departmentId;
     private String departmentName;
+    private String createdBy;
+    private String lastModifiedBy;
 }

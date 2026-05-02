@@ -1,6 +1,6 @@
 package org.example.employeepayroll.services;
 
-import org.example.employeepayroll.entities.User;
+import org.example.employeepayroll.entities.Users;
 import org.example.employeepayroll.security.UserPrincipal;
 import org.example.employeepayroll.repositories.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,7 +18,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
+        Users user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
         return new UserPrincipal(user);

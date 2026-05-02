@@ -10,6 +10,8 @@ import org.example.employeepayroll.mappers.EmployeeMapper;
 import org.example.employeepayroll.repositories.DepartmentRepository;
 import org.example.employeepayroll.repositories.EmployeeRepository;
 import org.example.employeepayroll.specifications.EmployeeSpecification;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -20,13 +22,16 @@ public class EmployeeService {
     private final EmployeeRepository employeeRepository;
     private final EmployeeMapper employeeMapper;
     private final DepartmentRepository departmentRepository;
+    private final AuditLogService auditLogService;
 
-    public EmployeeService(EmployeeRepository employeeRepository, EmployeeMapper employeeMapper, DepartmentRepository departmentRepository) {
+    public EmployeeService(EmployeeRepository employeeRepository, EmployeeMapper employeeMapper, DepartmentRepository departmentRepository, AuditLogService auditLogService) {
         this.employeeRepository = employeeRepository;
         this.employeeMapper = employeeMapper;
         this.departmentRepository = departmentRepository;
+        this.auditLogService = auditLogService;
     }
 
+    @Cacheable(value="employees", key="#id")
     public EmployeeResponseDto getEmployeeById(Long id) {
         Employee employee = employeeRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Employee with id: " + id + " not found")
@@ -38,38 +43,118 @@ public class EmployeeService {
         Department department = departmentRepository.findById(employeeRequestDto.getDepartmentId()).orElseThrow(
                 () -> new ResourceNotFoundException("Department with id: " + employeeRequestDto.getDepartmentId() + " not found")
         );
+        Employee manager = employeeRequestDto.getManagerId() != null ? employeeRepository.findById(employeeRequestDto.getManagerId()).orElseThrow(
+                () -> new ResourceNotFoundException("Manager with id: " + employeeRequestDto.getManagerId() + " not found")
+        ) : null;
         Employee employee = employeeMapper.toEntity(employeeRequestDto);
         employee.setDepartment(department);
+        employee.setManager(manager);
         employeeRepository.save(employee);
+
+        auditLogService.logCreate(Employee.class.getSimpleName(), employee.getId());
+
         return employeeMapper.toResponse(employee);
     }
 
+    @CacheEvict(value="employees", key="#id")
     public EmployeeResponseDto putEmployee(Long id, EmployeeRequestDto employeeRequestDto) {
-        Employee employee = employeeRepository.findById(id).orElseThrow(
+        Employee existing = employeeRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Employee with id: " + id + " not found")
         );
         Department department = departmentRepository.findById(employeeRequestDto.getDepartmentId()).orElseThrow(
                 () -> new ResourceNotFoundException("Department with id: " + id + " not found")
         );
-        employeeMapper.updateEntity(employeeRequestDto, employee);
-        employee.setDepartment(department);
-        employee = employeeRepository.save(employee);
-        return employeeMapper.toResponse(employee);
-    }
+        Employee manager = employeeRequestDto.getManagerId() != null ? employeeRepository.findById(employeeRequestDto.getManagerId()).orElseThrow(
+                () -> new ResourceNotFoundException("Manager with id: " + employeeRequestDto.getManagerId() + " not found")
+        ) : null;
+        // Snapshot scalar fields + FK IDs before mutation
+        Employee oldSnapshot = existing.snapshot();
+        Long oldDepartmentId = existing.getDepartment() != null
+                ? existing.getDepartment().getId() : null;
+        Long oldManagerId = existing.getManager() != null
+                ? existing.getManager().getId() : null;
 
+        employeeMapper.updateEntity(employeeRequestDto, existing);
+        existing.setDepartment(department);
+        existing.setManager(manager);
+        Employee updated = employeeRepository.save(existing);
+
+        // Diff scalars via reflection
+        auditLogService.logChanges(
+                Employee.class.getSimpleName(), updated.getId(),
+                oldSnapshot, updated.snapshot());
+
+        // Diff FK IDs manually
+        Long newDepartmentId = updated.getDepartment() != null
+                ? updated.getDepartment().getId() : null;
+        auditLogService.logFkChange(
+                Employee.class.getSimpleName(), updated.getId(),
+                "departmentId", oldDepartmentId, newDepartmentId);
+
+        Long newManagerId = updated.getManager() != null ? updated.getManager().getId() : null;
+        auditLogService.logFkChange(
+                Employee.class.getSimpleName(), updated.getId(),
+                "managerId", oldManagerId, newManagerId);
+
+        return employeeMapper.toResponse(updated);
+    }
+    @CacheEvict(value="employees", key="#id")
     public EmployeeResponseDto patchEmployee(Long id, EmployeeRequestDto employeeRequestDto) {
-        Employee employee = employeeRepository.findById(id).orElseThrow(
+        Employee existing = employeeRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Employee with id: " + id + " not found")
         );
-        applyPatch(employeeRequestDto, employee);
-        if(employeeRequestDto.getDepartmentId() != null) {
-            Department department = departmentRepository.findById(employeeRequestDto.getDepartmentId()).orElseThrow(
-                    () -> new ResourceNotFoundException("Department with id: " + employeeRequestDto.getDepartmentId() + " not found")
-            );
-            employee.setDepartment(department);
+
+        // Snapshot before mutation
+        Employee oldSnapshot = existing.snapshot();
+        Long oldDepartmentId = existing.getDepartment() != null
+                ? existing.getDepartment().getId() : null;
+        Long oldManagerId = existing.getManager() != null
+                ? existing.getManager().getId() : null;
+
+        applyPatch(employeeRequestDto, existing);
+
+        if (employeeRequestDto.getDepartmentId() != null) {
+            Department department = departmentRepository.findById(employeeRequestDto.getDepartmentId())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Department with id: " + employeeRequestDto.getDepartmentId() + " not found"));
+            existing.setDepartment(department);
         }
-        employee = employeeRepository.save(employee);
-        return employeeMapper.toResponse(employee);
+
+        if (employeeRequestDto.getManagerId() != null) {
+            Employee manager = employeeRepository.findById(employeeRequestDto.getManagerId())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Manager with id: " + employeeRequestDto.getManagerId() + " not found"
+                    ));
+            existing.setManager(manager);
+        }
+
+        Employee updated = employeeRepository.save(existing);
+
+        // Diff scalars
+        auditLogService.logChanges(
+                Employee.class.getSimpleName(), updated.getId(),
+                oldSnapshot, updated.snapshot());
+
+        // Diff department FK only if it was in the patch request
+        if (employeeRequestDto.getDepartmentId() != null) {
+            Long newDepartmentId = updated.getDepartment() != null
+                    ? updated.getDepartment().getId() : null;
+
+            auditLogService.logFkChange(
+                    Employee.class.getSimpleName(), updated.getId(),
+                    "departmentId", oldDepartmentId, newDepartmentId);
+        }
+
+        if (employeeRequestDto.getManagerId() != null) {
+            Long newManagerId = updated.getManager() != null
+                    ? updated.getManager().getId() : null;
+
+            auditLogService.logFkChange(
+                    Employee.class.getSimpleName(), updated.getId(),
+                    "managerId", oldManagerId, newManagerId);
+        }
+
+        return employeeMapper.toResponse(updated);
     }
 
     private void applyPatch(EmployeeRequestDto employeeRequestDto, Employee employee) {
@@ -83,12 +168,16 @@ public class EmployeeService {
         if(employeeRequestDto.getDateOfJoining() != null) employee.setDateOfJoining(employeeRequestDto.getDateOfJoining());
     }
 
+    @CacheEvict(value="employees", key="#id")
     public EmployeeResponseDto deleteEmployeeById(Long id) {
         Employee employee = employeeRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("Employee with id: " + id + " not found")
         );
         employee.setStatus(Status.DELETE);
         employee = employeeRepository.save(employee);
+
+        auditLogService.logDelete(Employee.class.getSimpleName(), id);
+
         return employeeMapper.toResponse(employee);
     }
 

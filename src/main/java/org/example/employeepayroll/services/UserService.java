@@ -2,7 +2,7 @@ package org.example.employeepayroll.services;
 
 import org.example.employeepayroll.dtos.RoleUpdateDto;
 import org.example.employeepayroll.dtos.UserResponseDto;
-import org.example.employeepayroll.entities.User;
+import org.example.employeepayroll.entities.Users;
 import org.example.employeepayroll.exceptions.ResourceNotFoundException;
 import org.example.employeepayroll.repositories.UserRepository;
 import org.springframework.security.core.Authentication;
@@ -17,7 +17,7 @@ public class UserService {
     }
 
     public UserResponseDto updateRole(Long id, RoleUpdateDto dto, Authentication auth) {
-        User user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        Users user = userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         String currentUsername = auth.getName();
         if (user.getIsProtected()) {

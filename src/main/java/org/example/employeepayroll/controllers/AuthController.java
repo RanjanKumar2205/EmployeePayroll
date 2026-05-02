@@ -3,6 +3,7 @@ package org.example.employeepayroll.controllers;
 import jakarta.validation.Valid;
 import org.example.employeepayroll.dtos.AuthRequestDto;
 import org.example.employeepayroll.services.AuthService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +17,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody AuthRequestDto requestDto) {
-        return ResponseEntity.ok(authService.register(requestDto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(authService.register(requestDto));
     }
 
     @PostMapping("/login")

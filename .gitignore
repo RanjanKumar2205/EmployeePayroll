@@ -39,10 +39,10 @@ out/
 ### Properties ###
 application-dev.properties
 application-prod.properties
+application-test.properties
 
 ### TODO: temporary ###
-AuditLog.java
 LeaveRecord.java
 PaySlip.java
 PayrollRun.java
-SalaryStructure.java
+RedisCacheConfig.java

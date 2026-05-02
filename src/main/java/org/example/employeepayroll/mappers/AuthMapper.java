@@ -3,7 +3,7 @@ package org.example.employeepayroll.mappers;
 import org.example.employeepayroll.dtos.AuthRequestDto;
 import org.example.employeepayroll.dtos.AuthResponseDto;
 import org.example.employeepayroll.entities.Role;
-import org.example.employeepayroll.entities.User;
+import org.example.employeepayroll.entities.Users;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -17,15 +17,15 @@ public class AuthMapper {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    public User toEntity(AuthRequestDto dto) {
-        return User.builder()
+    public Users toEntity(AuthRequestDto dto) {
+        return Users.builder()
                 .username(dto.getUsername())
                 .password(bCryptPasswordEncoder.encode(dto.getPassword()))
                 .role(Role.GUEST)
                 .build();
     }
 
-    public AuthResponseDto toResponse(User user) {
+    public AuthResponseDto toResponse(Users user) {
         return AuthResponseDto.builder()
                 .username(user.getUsername())
                 .role(user.getRole())

@@ -4,9 +4,8 @@ import org.example.employeepayroll.dtos.AuthRequestDto;
 import org.example.employeepayroll.dtos.AuthResponseDto;
 import org.example.employeepayroll.entities.Employee;
 import org.example.employeepayroll.entities.Role;
-import org.example.employeepayroll.entities.User;
+import org.example.employeepayroll.entities.Users;
 import org.example.employeepayroll.repositories.EmployeeRepository;
-import org.example.employeepayroll.security.UserPrincipal;
 import org.example.employeepayroll.exceptions.DuplicateResourceException;
 import org.example.employeepayroll.mappers.AuthMapper;
 import org.example.employeepayroll.repositories.UserRepository;
@@ -39,7 +38,7 @@ public class AuthService {
     public AuthResponseDto register(AuthRequestDto dto) {
         if(userRepository.findByUsername(dto.getUsername())
                 .isPresent()) {throw new DuplicateResourceException("Username already exists: " + dto.getUsername());}
-        User user = authMapper.toEntity(dto);
+        Users user = authMapper.toEntity(dto);
 
         Optional<Employee> employee = employeeRepository.findByEmail(dto.getUsername());
         if(employee.isPresent()) {
@@ -49,11 +48,11 @@ public class AuthService {
         userRepository.save(user);
 
         // Generate token immediately — user is logged in after registering
-        UserDetails userDetails = new UserPrincipal(user);
-        String token = jwtUtil.generateToken(userDetails);
+//        UserDetails userDetails = new UserPrincipal(user);
+//        String token = jwtUtil.generateToken(userDetails);
 
         AuthResponseDto response = authMapper.toResponse(user);
-        response.setToken(token);
+//        response.setToken(token);
         return response;
     }
 

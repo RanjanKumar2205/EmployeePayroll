@@ -1,19 +1,14 @@
 package org.example.employeepayroll.controllers;
 
 import jakarta.validation.Valid;
-import org.example.employeepayroll.dtos.DepartmentRequestDto;
-import org.example.employeepayroll.dtos.DepartmentResponseDto;
 import org.example.employeepayroll.dtos.SalaryRequestDto;
 import org.example.employeepayroll.dtos.SalaryResponseDto;
-import org.example.employeepayroll.services.DepartmentService;
 import org.example.employeepayroll.services.SalaryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Collection;
 
 @RestController
 @RequestMapping("/api/v1/salaryStructure")

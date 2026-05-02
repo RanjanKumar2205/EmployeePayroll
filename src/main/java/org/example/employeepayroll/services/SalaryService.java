@@ -15,7 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.stream.Collectors;
+
+import static org.example.employeepayroll.services.EmployeeService.EMPLOYEE_NOT_FOUND;
 
 @Service
 public class SalaryService {
@@ -32,14 +33,14 @@ public class SalaryService {
         return salaryRepository.findAll()
                 .stream()
                 .map(salaryMapper::toResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public Collection<SalaryResponseDto> getSalariesByEmployeeId(Long id) {
         return salaryRepository.findByEmployeeId(id)
                 .stream()
                 .map(salaryMapper::toResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public SalaryResponseDto getSalaryById(Long id) {
@@ -51,7 +52,7 @@ public class SalaryService {
 
     public SalaryResponseDto addSalary(@Valid SalaryRequestDto salaryRequestDto) {
         Employee employee = employeeRepository.findById(salaryRequestDto.getEmployeeId()).orElseThrow(
-                () -> new ResourceNotFoundException("Employee with id: " + salaryRequestDto.getEmployeeId() + " not found")
+                () -> new ResourceNotFoundException(String.format(EMPLOYEE_NOT_FOUND, salaryRequestDto.getEmployeeId()))
         );
         salaryRepository.findByEmployeeIdAndIsActiveTrue(salaryRequestDto.getEmployeeId())
                 .ifPresent(s -> {

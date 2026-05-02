@@ -28,7 +28,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-// No Spring context — pure unit tests using Mockito only
 @ExtendWith(MockitoExtension.class)
 class EmployeeServiceTest {
 
@@ -46,8 +45,6 @@ class EmployeeServiceTest {
 
     @InjectMocks
     private EmployeeService employeeService;
-
-    // ── Test fixtures ──────────────────────────────────────────────────────────
 
     private Department department;
     private Employee employee;
@@ -103,8 +100,6 @@ class EmployeeServiceTest {
                 .build();
     }
 
-    // ── Test 1: createEmployee — verify repository.save() called with correct entity ──
-
     @Test
     @DisplayName("addEmployee: saves entity and returns mapped response DTO")
     void addEmployee_savesEntityAndReturnsResponseDto() {
@@ -129,8 +124,6 @@ class EmployeeServiceTest {
         assertThat(result.getDepartmentName()).isEqualTo("Engineering");
     }
 
-    // ── Test 2: getById found — returns correct DTO ───────────────────────────
-
     @Test
     @DisplayName("getEmployeeById: returns response DTO when employee exists")
     void getEmployeeById_found_returnsResponseDto() {
@@ -148,8 +141,6 @@ class EmployeeServiceTest {
         verify(employeeRepository, times(1)).findById(1L);
     }
 
-    // ── Test 3: getById not found — throws ResourceNotFoundException ──────────
-
     @Test
     @DisplayName("getEmployeeById: throws ResourceNotFoundException when employee does not exist")
     void getEmployeeById_notFound_throwsResourceNotFoundException() {
@@ -164,8 +155,6 @@ class EmployeeServiceTest {
         // Mapper must never be called — no entity to map
         verify(employeeMapper, never()).toResponse(any());
     }
-
-    // ── Test 4: updateEmployee (PUT) — verify save() called with updated data ─
 
     @Test
     @DisplayName("putEmployee: saves updated entity and returns updated response DTO")
@@ -216,11 +205,9 @@ class EmployeeServiceTest {
 
         // Assert — save() must be called once and the response reflects the new designation
         verify(employeeRepository, times(1)).save(any(Employee.class));
-        verify(employeeMapper, times(1)).updateEntity(eq(updateRequest), eq(employee));
+        verify(employeeMapper, times(1)).updateEntity(updateRequest, employee);
         assertThat(result.getDesignation()).isEqualTo("Senior Software Engineer");
     }
-
-    // ── Test 5: deleteEmployee — verify status set to DELETE, save() called ───
 
     @Test
     @DisplayName("deleteEmployeeById: sets status to DELETE, calls save(), returns DTO")
@@ -248,6 +235,6 @@ class EmployeeServiceTest {
         assertThat(result.getStatus()).isEqualTo(Status.DELETE);
 
         // Audit log for delete must fire
-        verify(auditLogService, times(1)).logDelete(eq("Employee"), eq(1L));
+        verify(auditLogService, times(1)).logDelete("Employee", 1L);
     }
 }

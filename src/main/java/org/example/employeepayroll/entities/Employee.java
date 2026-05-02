@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-@Table(name = "employee", indexes = {@Index(name = "IX_EMPLOYEE_I",columnList = "department_id,status")})
+@Table(name = "employee") //, indexes = {@Index(name = "IX_EMPLOYEE_I",columnList = "department_id,status")})
 public class Employee {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

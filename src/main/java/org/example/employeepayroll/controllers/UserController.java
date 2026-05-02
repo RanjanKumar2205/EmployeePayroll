@@ -2,7 +2,6 @@ package org.example.employeepayroll.controllers;
 
 import org.example.employeepayroll.dtos.RoleUpdateDto;
 import org.example.employeepayroll.dtos.UserResponseDto;
-import org.example.employeepayroll.repositories.UserRepository;
 import org.example.employeepayroll.services.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;

@@ -10,10 +10,11 @@ import org.example.employeepayroll.repositories.DepartmentRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 @Service
 public class DepartmentService {
+    
+    public static final String DEPARTMENT_NOT_FOUND = "Department with id: %s not found";
     
     private final DepartmentRepository departmentRepository;
     private final DepartmentMapper departmentMapper;
@@ -27,12 +28,12 @@ public class DepartmentService {
         return departmentRepository.findAll()
                 .stream()
                 .map(departmentMapper::toResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public DepartmentResponseDto getDepartmentById(Long id) {
         Department department = departmentRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Department with id: " + id + " not found")
+                () -> new ResourceNotFoundException(String.format(DEPARTMENT_NOT_FOUND, id))
         );
         return departmentMapper.toResponse(department);
     }
@@ -45,7 +46,7 @@ public class DepartmentService {
 
     public DepartmentResponseDto putDepartment(Long id, DepartmentRequestDto departmentRequestDto) {
         Department department = departmentRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Department with id: " + id + " not found")
+                () -> new ResourceNotFoundException(String.format(DEPARTMENT_NOT_FOUND, id))
         );
         departmentMapper.updateEntity(departmentRequestDto, department);
         department = departmentRepository.save(department);
@@ -54,7 +55,7 @@ public class DepartmentService {
 
     public DepartmentResponseDto patchDepartment(Long id, DepartmentRequestDto departmentRequestDto) {
         Department department = departmentRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Department with id: " + id + " not found")
+                () -> new ResourceNotFoundException(String.format(DEPARTMENT_NOT_FOUND, id))
         );
         applyPatch(departmentRequestDto, department);
         department = departmentRepository.save(department);
@@ -68,7 +69,7 @@ public class DepartmentService {
 
     public DepartmentResponseDto deleteDepartmentById(Long id) {
         Department department = departmentRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Department with id: " + id + " not found")
+                () -> new ResourceNotFoundException(String.format(DEPARTMENT_NOT_FOUND, id))
         );
         department.setStatus(Status.DELETE);
         department = departmentRepository.save(department);

@@ -36,8 +36,9 @@ public class AuthService {
     }
 
     public AuthResponseDto register(AuthRequestDto dto) {
-        if(userRepository.findByUsername(dto.getUsername())
-                .isPresent()) {throw new DuplicateResourceException("Username already exists: " + dto.getUsername());}
+        if(userRepository.findByUsername(dto.getUsername()).isPresent()) {
+            throw new DuplicateResourceException("Username already exists: " + dto.getUsername());
+        }
         Users user = authMapper.toEntity(dto);
 
         Optional<Employee> employee = employeeRepository.findByEmail(dto.getUsername());
@@ -47,13 +48,7 @@ public class AuthService {
         }
         userRepository.save(user);
 
-        // Generate token immediately — user is logged in after registering
-//        UserDetails userDetails = new UserPrincipal(user);
-//        String token = jwtUtil.generateToken(userDetails);
-
-        AuthResponseDto response = authMapper.toResponse(user);
-//        response.setToken(token);
-        return response;
+        return authMapper.toResponse(user);
     }
 
     public AuthResponseDto login(AuthRequestDto dto) {

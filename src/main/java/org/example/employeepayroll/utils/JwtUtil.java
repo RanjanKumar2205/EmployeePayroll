@@ -1,7 +1,6 @@
 package org.example.employeepayroll.utils;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -13,19 +12,20 @@ import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 @Component
 public class JwtUtil {
-    private String jwtSecret;
-    private Long jwtExpiry;
+    private final String jwtSecret;
+    private final Long jwtExpiry;
 
     public JwtUtil(@Value("${jwt.secret}") String jwtSecret, @Value("${jwt.expiry}") Long jwtExpiry) {
         this.jwtSecret = jwtSecret;
         this.jwtExpiry = jwtExpiry;
     }
 
-    public String generateToken(HashMap<String, Object> claims, UserDetails userDetails) {
+    public String generateToken(Map<String, Object> claims, UserDetails userDetails) {
         SecretKey key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
 
         return Jwts.builder()

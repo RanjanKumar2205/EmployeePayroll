@@ -33,8 +33,6 @@ public class EmployeeController {
         this.employeeService = employeeService;
     }
 
-    // ── Search ────────────────────────────────────────────────────────────────
-
     @Operation(summary = "Search employees", description = "Filter employees by name, department, and/or status. All parameters are optional. Accessible by ADMIN, HR, and EMPLOYEE.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Search results returned",
@@ -55,8 +53,6 @@ public class EmployeeController {
         return ResponseEntity.ok(results);
     }
 
-    // ── Get All ───────────────────────────────────────────────────────────────
-
     @Operation(summary = "Get all employees", description = "Returns a paginated list of all employees. Accessible by ADMIN and HR.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Employee list returned",
@@ -72,8 +68,6 @@ public class EmployeeController {
         Page<EmployeeResponseDto> employeeList = employeeService.getEmployees(pageable);
         return ResponseEntity.ok(employeeList);
     }
-
-    // ── Get By Id ─────────────────────────────────────────────────────────────
 
     @Operation(summary = "Get employee by ID", description = "Returns a single employee by their ID. ADMIN and HR can fetch any employee. EMPLOYEE can only fetch their own record.")
     @ApiResponses({
@@ -93,8 +87,6 @@ public class EmployeeController {
         EmployeeResponseDto employee = employeeService.getEmployeeById(id);
         return ResponseEntity.ok(employee);
     }
-
-    // ── Create ────────────────────────────────────────────────────────────────
 
     @Operation(summary = "Create employee", description = "Creates a new employee record. Requires ADMIN or HR role.")
     @ApiResponses({
@@ -118,8 +110,6 @@ public class EmployeeController {
         return ResponseEntity.status(HttpStatus.CREATED).body(newEmployee);
     }
 
-    // ── Full Update ───────────────────────────────────────────────────────────
-
     @Operation(summary = "Full update employee", description = "Replaces all fields of an existing employee (PUT semantics). Requires ADMIN or HR role.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Employee updated",
@@ -142,8 +132,6 @@ public class EmployeeController {
         return ResponseEntity.ok(employee);
     }
 
-    // ── Partial Update ────────────────────────────────────────────────────────
-
     @Operation(summary = "Partial update employee", description = "Updates only the provided fields (PATCH semantics). Null fields are ignored. Requires ADMIN or HR role.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Employee patched",
@@ -163,8 +151,6 @@ public class EmployeeController {
         EmployeeResponseDto employee = employeeService.patchEmployee(id, employeeRequestDto);
         return ResponseEntity.ok(employee);
     }
-
-    // ── Delete ────────────────────────────────────────────────────────────────
 
     @Operation(summary = "Delete employee", description = "Soft-deletes an employee by ID (sets status to INACTIVE). Requires ADMIN role only.")
     @ApiResponses({

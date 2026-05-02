@@ -58,4 +58,4 @@ CREATE TABLE IF NOT EXISTS salary_structure (
     employee_id BIGINT NOT NULL,
     PRIMARY KEY (id),
     KEY IX_SALARY_STRUCTURE_I (employee_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci

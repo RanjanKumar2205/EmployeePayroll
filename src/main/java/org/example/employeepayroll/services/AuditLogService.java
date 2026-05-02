@@ -65,7 +65,7 @@ public class AuditLogService {
                     changes.put(field.getName(), new String[]{oldVal, newVal});
                 }
             } catch (IllegalAccessException e) {
-                // skip inaccessible fields
+                throw new IllegalStateException("Reflection access failed for field: " + field.getName(), e);
             }
         }
         return changes;

@@ -15,7 +15,7 @@ import java.util.Optional;
 public interface EmployeeRepository extends JpaRepository<Employee, Long>, JpaSpecificationExecutor<Employee> {
 
     Optional<Employee> findByEmail(String username);
-//    @EntityGraph(attributePaths={"department"}
+
     @Query("SELECT e FROM Employee e JOIN FETCH e.department")
     Page<Employee> findAll(@NonNull Pageable pageable);
 }

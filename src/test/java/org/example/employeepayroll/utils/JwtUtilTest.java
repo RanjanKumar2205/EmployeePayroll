@@ -11,7 +11,7 @@ import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class JwtUtilTest {
+class JwtUtilTest {
     private JwtUtil jwtUtil;
     private UserDetails userDetails;
     private static final String TEST_SECRET = "test-secret-key-must-be-at-least-32-characters-long";
@@ -35,8 +35,7 @@ public class JwtUtilTest {
     void generateToken_shouldReturnNonEmptyToken() {
         String token = jwtUtil.generateToken(userDetails);
 
-        assertThat(token).isNotNull();
-        assertThat(token).isNotBlank();
+        assertThat(token).isNotNull().isNotBlank();
         // JWT always has 3 parts separated by dots
         assertThat(token.split("\\.")).hasSize(3);
     }
@@ -83,9 +82,7 @@ public class JwtUtilTest {
 
         Date expiration = jwtUtil.extractExpiration(token);
 
-        assertThat(expiration).isNotNull();
-        // Expiration should be in the future
-        assertThat(expiration).isAfter(new Date());
+        assertThat(expiration).isNotNull().isAfter(new Date());
     }
 
     @Test

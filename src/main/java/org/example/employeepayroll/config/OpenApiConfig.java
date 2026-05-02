@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class OpenApiConfig {
+    private static final String BEARER = "bearerAuth";
 
     @Bean
     public OpenAPI openAPI() {
@@ -19,11 +20,11 @@ public class OpenApiConfig {
                         .description("REST API for the Employee Payroll Spring Boot project")
                         .version("v1.0"))
                 // Adds a global "Authorize" button in Swagger UI for Bearer JWT
-                .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
+                .addSecurityItem(new SecurityRequirement().addList(BEARER))
                 .components(new Components()
-                        .addSecuritySchemes("bearerAuth",
+                        .addSecuritySchemes(BEARER,
                                 new SecurityScheme()
-                                        .name("bearerAuth")
+                                        .name(BEARER)
                                         .type(SecurityScheme.Type.HTTP)
                                         .scheme("bearer")
                                         .bearerFormat("JWT")));

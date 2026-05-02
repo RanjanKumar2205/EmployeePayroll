@@ -17,8 +17,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import static org.example.employeepayroll.services.DepartmentService.DEPARTMENT_NOT_FOUND;
+
 @Service
 public class EmployeeService {
+    public static final String EMPLOYEE_NOT_FOUND = "Employee with id: %s not found";
+    public static final String MANAGER_NOT_FOUND = "Manager with id: %s not found";
     private final EmployeeRepository employeeRepository;
     private final EmployeeMapper employeeMapper;
     private final DepartmentRepository departmentRepository;
@@ -34,18 +38,16 @@ public class EmployeeService {
     @Cacheable(value="employees", key="#id")
     public EmployeeResponseDto getEmployeeById(Long id) {
         Employee employee = employeeRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Employee with id: " + id + " not found")
+                () -> new ResourceNotFoundException(String.format(EMPLOYEE_NOT_FOUND, id))
         );
         return employeeMapper.toResponse(employee);
     }
 
     public EmployeeResponseDto addEmployee(EmployeeRequestDto employeeRequestDto) {
         Department department = departmentRepository.findById(employeeRequestDto.getDepartmentId()).orElseThrow(
-                () -> new ResourceNotFoundException("Department with id: " + employeeRequestDto.getDepartmentId() + " not found")
+                () -> new ResourceNotFoundException(String.format(DEPARTMENT_NOT_FOUND, employeeRequestDto.getDepartmentId()))
         );
-        Employee manager = employeeRequestDto.getManagerId() != null ? employeeRepository.findById(employeeRequestDto.getManagerId()).orElseThrow(
-                () -> new ResourceNotFoundException("Manager with id: " + employeeRequestDto.getManagerId() + " not found")
-        ) : null;
+        Employee manager = resolveManager(employeeRequestDto.getManagerId());
         Employee employee = employeeMapper.toEntity(employeeRequestDto);
         employee.setDepartment(department);
         employee.setManager(manager);
@@ -59,14 +61,12 @@ public class EmployeeService {
     @CacheEvict(value="employees", key="#id")
     public EmployeeResponseDto putEmployee(Long id, EmployeeRequestDto employeeRequestDto) {
         Employee existing = employeeRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Employee with id: " + id + " not found")
+                () -> new ResourceNotFoundException(String.format(EMPLOYEE_NOT_FOUND, id))
         );
         Department department = departmentRepository.findById(employeeRequestDto.getDepartmentId()).orElseThrow(
-                () -> new ResourceNotFoundException("Department with id: " + id + " not found")
+                () -> new ResourceNotFoundException(String.format(DEPARTMENT_NOT_FOUND, id))
         );
-        Employee manager = employeeRequestDto.getManagerId() != null ? employeeRepository.findById(employeeRequestDto.getManagerId()).orElseThrow(
-                () -> new ResourceNotFoundException("Manager with id: " + employeeRequestDto.getManagerId() + " not found")
-        ) : null;
+        Employee manager = resolveManager(employeeRequestDto.getManagerId());
         // Snapshot scalar fields + FK IDs before mutation
         Employee oldSnapshot = existing.snapshot();
         Long oldDepartmentId = existing.getDepartment() != null
@@ -101,7 +101,7 @@ public class EmployeeService {
     @CacheEvict(value="employees", key="#id")
     public EmployeeResponseDto patchEmployee(Long id, EmployeeRequestDto employeeRequestDto) {
         Employee existing = employeeRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Employee with id: " + id + " not found")
+                () -> new ResourceNotFoundException(String.format(EMPLOYEE_NOT_FOUND, id))
         );
 
         // Snapshot before mutation
@@ -116,16 +116,12 @@ public class EmployeeService {
         if (employeeRequestDto.getDepartmentId() != null) {
             Department department = departmentRepository.findById(employeeRequestDto.getDepartmentId())
                     .orElseThrow(() -> new ResourceNotFoundException(
-                            "Department with id: " + employeeRequestDto.getDepartmentId() + " not found"));
+                            String.format(DEPARTMENT_NOT_FOUND, employeeRequestDto.getDepartmentId())));
             existing.setDepartment(department);
         }
 
         if (employeeRequestDto.getManagerId() != null) {
-            Employee manager = employeeRepository.findById(employeeRequestDto.getManagerId())
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Manager with id: " + employeeRequestDto.getManagerId() + " not found"
-                    ));
-            existing.setManager(manager);
+            existing.setManager(resolveManager(employeeRequestDto.getManagerId()));
         }
 
         Employee updated = employeeRepository.save(existing);
@@ -171,7 +167,7 @@ public class EmployeeService {
     @CacheEvict(value="employees", key="#id")
     public EmployeeResponseDto deleteEmployeeById(Long id) {
         Employee employee = employeeRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Employee with id: " + id + " not found")
+                () -> new ResourceNotFoundException(String.format(EMPLOYEE_NOT_FOUND, id))
         );
         employee.setStatus(Status.DELETE);
         employee = employeeRepository.save(employee);
@@ -193,5 +189,11 @@ public class EmployeeService {
 
         return employeeRepository.findAll(spec, pageable)
                 .map(employeeMapper::toResponse);
+    }
+
+    private Employee resolveManager(Long managerId) {
+        if (managerId == null) return null;
+        return employeeRepository.findById(managerId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(MANAGER_NOT_FOUND, managerId)));
     }
 }
